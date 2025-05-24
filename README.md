@@ -75,10 +75,10 @@ CREATE TABLE airlines.daily_flights_fact (
   ![Step function](./Images/step_function.png)
 - Glue Crawler detects and catalogs the new data.
 - Glue Job:
-![Glue ETL Job](./Images/etl_job.png)
   - Joins flight data with `airports_dim`
   - Filters flights with delay > 60 minutes
   - Loads the transformed result into `daily_flights_fact` table in Redshift
+   ![Glue ETL Job](./Images/etl_job.png)
 - SNS sends success/failure notifications.
 
 ---
