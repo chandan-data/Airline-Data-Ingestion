@@ -64,7 +64,7 @@ CREATE TABLE airlines.daily_flights_fact (
     dep_delay BIGINT,
     arr_delay BIGINT
 );
-'''
+```
 
 ## ⚙️ ETL Workflow
 
