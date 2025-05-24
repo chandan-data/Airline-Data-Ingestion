@@ -21,8 +21,6 @@ This project showcases a serverless, event-driven data pipeline built on AWS. It
 
 ### S3 Bucket: `airlinedata-land-zn`
 
-![S3 Structure](./s3.png)
-
 - `dim/` – Contains static airport dimension data.
 - `daily_flights/` – Contains raw daily flight data (partitioned like a Hive table).
 
