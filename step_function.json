@@ -1,0 +1,90 @@
+{
+  "Comment": "A description of my state machine",
+  "StartAt": "StartCrawler",
+  "States": {
+    "StartCrawler": {
+      "Type": "Task",
+      "Arguments": {
+        "Name": "flights-data-crawler"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:glue:startCrawler",
+      "Next": "GetCrawler",
+      "Output": {}
+    },
+    "GetCrawler": {
+      "Type": "Task",
+      "Arguments": {
+        "Name": "flights-data-crawler"
+      },
+      "Resource": "arn:aws:states:::aws-sdk:glue:getCrawler",
+      "Next": "Is_Running?",
+      "Assign": {
+        "Crawler": "{% $states.result.Crawler %}"
+      },
+      "Output": {}
+    },
+    "Is_Running?": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Wait",
+          "Condition": "{% $contains($Crawler.State, \"RUNNING\") %}"
+        }
+      ],
+      "Default": "Glue StartJobRun"
+    },
+    "Wait": {
+      "Type": "Wait",
+      "Seconds": 5,
+      "Next": "GetCrawler"
+    },
+    "Glue StartJobRun": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::glue:startJobRun.sync",
+      "Arguments": {
+        "JobName": "flights_data_ingestion"
+      },
+      "Catch": [
+        {
+          "ErrorEquals": [
+            "States.TaskFailed"
+          ],
+          "Next": "Failed_Notification"
+        }
+      ],
+      "Next": "Glue_Job_Status",
+      "Assign": {
+        "JobRunState": "{% $states.result.Payload.JobRunState %}"
+      }
+    },
+    "Glue_Job_Status": {
+      "Type": "Choice",
+      "Choices": [
+        {
+          "Next": "Success_Notification",
+          "Condition": "{% $contains($JobRunState, \"SUCCEEDED\") %}"
+        }
+      ],
+      "Default": "Failed_Notification"
+    },
+    "Success_Notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Arguments": {
+        "Message": "{% \"Glue Job Completed Successfully !!\" %}",
+        "TopicArn": "arn:aws:sns:ap-south-1:035866021534:JobStatusTopic"
+      },
+      "End": true
+    },
+    "Failed_Notification": {
+      "Type": "Task",
+      "Resource": "arn:aws:states:::sns:publish",
+      "Arguments": {
+        "Message": "{% \"Glue JOb Failed Please Try Again.\" %}",
+        "TopicArn": "arn:aws:sns:ap-south-1:035866021534:JobStatusTopic"
+      },
+      "End": true
+    }
+  },
+  "QueryLanguage": "JSONata"
+}
