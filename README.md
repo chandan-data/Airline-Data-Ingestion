@@ -65,3 +65,37 @@ CREATE TABLE airlines.daily_flights_fact (
     arr_delay BIGINT
 );
 
+
+## ⚙️ ETL Workflow
+
+- Raw daily flight data is uploaded to S3 (`daily_flights/` folder).
+- Amazon EventBridge detects the S3 upload and triggers a rule.
+- AWS Step Function is invoked.
+- Glue Crawler detects and catalogs the new data.
+- Glue Job:
+  - Joins flight data with `airports_dim`
+  - Filters flights with delay > 60 minutes
+  - Loads the transformed result into `daily_flights_fact` table in Redshift
+- SNS sends success/failure notifications.
+
+---
+
+## 🛡️ Services Used
+
+- Amazon S3  
+- Amazon Redshift  
+- Amazon EventBridge  
+- AWS Glue (Crawler + Job)  
+- AWS Step Functions  
+- Amazon SNS  
+- VPC for secure networking  
+- IAM Roles for permission management  
+
+---
+
+## 📊 Final Outcome
+
+- ✅ Scalable and automated ETL pipeline  
+- ✅ Real-time S3-triggered data ingestion  
+- ✅ Cleanly structured data in Redshift for analysis  
+- ✅ Fully serverless with minimal manual intervention
