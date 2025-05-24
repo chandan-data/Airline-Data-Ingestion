@@ -72,10 +72,10 @@ CREATE TABLE airlines.daily_flights_fact (
 - Raw daily flight data is uploaded to S3 (`daily_flights/` folder).
 - Amazon EventBridge detects the S3 upload and triggers a rule.
 - AWS Step Function is invoked.
-- ![Step function](./Images/step_function.png)
+  ![Step function](./Images/step_function.png)
 - Glue Crawler detects and catalogs the new data.
 - Glue Job:
-- ![Glue ETL Job](./Images/etl_job.png)
+   ![Glue ETL Job](./Images/etl_job.png)
   - Joins flight data with `airports_dim`
   - Filters flights with delay > 60 minutes
   - Loads the transformed result into `daily_flights_fact` table in Redshift
